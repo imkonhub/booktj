@@ -1,0 +1,13 @@
+{
+  "name": "booktg",
+  "version": "1.0.0",
+  "description": "Telegram Mini App: личная библиотека с загрузкой книг и подпиской через Telegram Stars",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^2.0.0"
+  }
+}
