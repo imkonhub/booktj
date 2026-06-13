@@ -309,6 +309,31 @@ app.post(`/webhook/${WEBHOOK_SECRET}`, async (req, res) => {
       persist();
       await tg("sendMessage", { chat_id: uid, text: "✅ Премиум активирован. Спасибо за подписку!" });
     }
+    // команда /start — приветствие + кнопка «Читать», открывающая приложение
+    const msg = update.message;
+    if (msg && typeof msg.text === "string" && msg.text.startsWith("/start")) {
+      const appUrl = process.env.APP_URL || `https://${req.headers.host}`;
+      const text =
+        "📚 <b>Читалка</b>\n\n" +
+        "Личная библиотека прямо в Telegram. Загружайте свои книги, читайте с удобными настройками и продолжайте с того места, где остановились.\n\n" +
+        "<b>Что умеет:</b>\n" +
+        "• Форматы TXT, EPUB, PDF, FB2, DOCX\n" +
+        "• Темы оформления, размер и шрифт, яркость\n" +
+        "• Масштаб для PDF, обложки и категории\n" +
+        "• Сохранение прогресса чтения\n" +
+        "• Каталог книг по подписке\n\n" +
+        "<b>Как пользоваться:</b>\n" +
+        "1. Нажмите «Читать» ниже.\n" +
+        "2. В приложении нажмите «Загрузить книгу» и выберите файл.\n" +
+        "3. Откройте книгу и настройте оформление кнопкой «Aa».\n\n" +
+        "Приятного чтения!";
+      await tg("sendMessage", {
+        chat_id: msg.chat.id,
+        text,
+        parse_mode: "HTML",
+        reply_markup: { inline_keyboard: [[{ text: "📖 Читать", web_app: { url: appUrl } }]] },
+      });
+    }
   } catch (e) {
     console.error("webhook error", e);
   }
