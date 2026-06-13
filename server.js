@@ -108,12 +108,16 @@ async function tg(method, payload) {
 }
 
 // ---------- Загрузка файлов ----------
-const ALLOWED = new Set([".txt", ".epub", ".pdf"]);
+const ALLOWED = new Set([".txt", ".epub", ".pdf", ".fb2", ".docx"]);
+const IMG = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 function mimeFor(ext) {
   if (ext === ".epub") return "application/epub+zip";
   if (ext === ".pdf") return "application/pdf";
+  if (ext === ".fb2") return "application/x-fictionbook+xml";
+  if (ext === ".docx") return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
   return "text/plain";
 }
+function kindFor(ext) { return ext.replace(".", ""); } // txt|epub|pdf|fb2|docx
 const storage = multer.diskStorage({
   destination: UPLOAD_DIR,
   filename: (req, file, cb) => {
@@ -123,12 +127,18 @@ const storage = multer.diskStorage({
 });
 const upload = multer({
   storage,
-  limits: { fileSize: 40 * 1024 * 1024 }, // 40 МБ (с запасом под PDF)
+  limits: { fileSize: 40 * 1024 * 1024 }, // 40 МБ
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
+    if (file.fieldname === "cover") return cb(null, IMG.has(ext));
     cb(null, ALLOWED.has(ext));
   },
 });
+const bookUpload = upload.fields([{ name: "file", maxCount: 1 }, { name: "cover", maxCount: 1 }]);
+function pick(b) {
+  return { id: b.id, title: b.title, author: b.author, category: b.category || "", kind: b.kind || "txt",
+    mime: b.mime, size: b.size, progress: b.progress || 0, hasCover: !!b.cover, free: !!b.free, created: b.created };
+}
 
 // ---------- Сервер ----------
 const app = express();
@@ -137,10 +147,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // профиль + библиотека
 app.post("/api/me", auth, (req, res) => {
-  const books = store.books
-    .filter((b) => b.user_id === req.user.id)
-    .sort((a, b) => b.created - a.created)
-    .map(({ id, title, author, mime, size, progress, created }) => ({ id, title, author, mime, size, progress, created }));
+  const books = store.books.filter((b) => b.user_id === req.user.id).sort((a, b) => b.created - a.created).map(pick);
   res.json({
     user: { id: req.user.id, name: req.user.first_name, username: req.user.username },
     premium: isPremium(req.user),
@@ -149,32 +156,31 @@ app.post("/api/me", auth, (req, res) => {
     freeLimit: FREE_LIMIT,
     starPrice: STAR_PRICE,
     books,
-    catalog: store.catalog
-      .slice()
-      .sort((a, b) => b.created - a.created)
-      .map(({ id, title, author, mime, size, free, created }) => ({ id, title, author, mime, size, free: !!free, created })),
+    catalog: store.catalog.slice().sort((a, b) => b.created - a.created).map(pick),
   });
 });
 
 // загрузка книги
-app.post("/api/upload", auth, upload.single("file"), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: "Поддерживаются .txt, .epub и .pdf до 40 МБ" });
+app.post("/api/upload", auth, bookUpload, (req, res) => {
+  const file = req.files && req.files.file && req.files.file[0];
+  const coverF = req.files && req.files.cover && req.files.cover[0];
+  if (!file) { if (coverF) fs.unlink(coverF.path, () => {}); return res.status(400).json({ error: "Поддерживаются .txt, .epub, .pdf, .fb2, .docx до 40 МБ" }); }
   const count = store.books.filter((b) => b.user_id === req.user.id).length;
   if (!isPremium(req.user) && count >= FREE_LIMIT) {
-    fs.unlink(req.file.path, () => {});
+    fs.unlink(file.path, () => {}); if (coverF) fs.unlink(coverF.path, () => {});
     return res.status(402).json({ error: "limit", message: `Бесплатно можно хранить ${FREE_LIMIT} книги. Оформите премиум для безлимита.` });
   }
-  const title = (req.body.title || req.file.originalname.replace(/\.[^.]+$/, "")).slice(0, 200);
-  const author = (req.body.author || "").slice(0, 120);
-  const ext = path.extname(req.file.originalname).toLowerCase();
-  const mime = mimeFor(ext);
+  const ext = path.extname(file.originalname).toLowerCase();
   const book = {
-    id: store.bookSeq++, user_id: req.user.id, title, author,
-    filename: req.file.filename, mime, size: req.file.size, progress: 0, created: now(),
+    id: store.bookSeq++, user_id: req.user.id,
+    title: (req.body.title || file.originalname.replace(/\.[^.]+$/, "")).slice(0, 200),
+    author: (req.body.author || "").slice(0, 120),
+    category: (req.body.category || "").slice(0, 60),
+    filename: file.filename, cover: coverF ? coverF.filename : null,
+    mime: mimeFor(ext), kind: kindFor(ext), size: file.size, progress: 0, created: now(),
   };
-  store.books.push(book);
-  persist();
-  res.json({ id: book.id, title, author, mime, size: req.file.size, progress: 0 });
+  store.books.push(book); persist();
+  res.json(pick(book));
 });
 
 // содержимое книги (стрим файла, проверка владельца)
@@ -184,6 +190,15 @@ app.post("/api/file/:id", auth, (req, res) => {
   const fp = path.join(UPLOAD_DIR, book.filename);
   if (!fs.existsSync(fp)) return res.status(404).json({ error: "file missing" });
   res.setHeader("Content-Type", book.mime);
+  fs.createReadStream(fp).pipe(res);
+});
+
+// обложка книги (картинка)
+app.post("/api/cover/:id", auth, (req, res) => {
+  const book = store.books.find((b) => b.id === +req.params.id && b.user_id === req.user.id);
+  if (!book || !book.cover) return res.status(404).end();
+  const fp = path.join(UPLOAD_DIR, book.cover);
+  if (!fs.existsSync(fp)) return res.status(404).end();
   fs.createReadStream(fp).pipe(res);
 });
 
@@ -200,6 +215,7 @@ app.post("/api/delete/:id", auth, (req, res) => {
   const i = store.books.findIndex((b) => b.id === +req.params.id && b.user_id === req.user.id);
   if (i >= 0) {
     fs.unlink(path.join(UPLOAD_DIR, store.books[i].filename), () => {});
+    if (store.books[i].cover) fs.unlink(path.join(UPLOAD_DIR, store.books[i].cover), () => {});
     store.books.splice(i, 1);
     persist();
   }
@@ -208,18 +224,32 @@ app.post("/api/delete/:id", auth, (req, res) => {
 
 // ---------- Каталог (общие книги, наполняет только админ) ----------
 // добавить книгу в каталог
-app.post("/api/catalog/upload", auth, upload.single("file"), (req, res) => {
-  if (!isAdmin(req.user)) { if (req.file) fs.unlink(req.file.path, () => {}); return res.status(403).json({ error: "forbidden" }); }
-  if (!req.file) return res.status(400).json({ error: "Поддерживаются .txt, .epub и .pdf до 40 МБ" });
-  const title = (req.body.title || req.file.originalname.replace(/\.[^.]+$/, "")).slice(0, 200);
-  const author = (req.body.author || "").slice(0, 120);
-  const free = req.body.free === "1" || req.body.free === "true"; // бесплатный ли (доступен без подписки)
-  const ext = path.extname(req.file.originalname).toLowerCase();
-  const mime = mimeFor(ext);
-  const book = { id: store.catalogSeq++, title, author, filename: req.file.filename, mime, size: req.file.size, free, created: now() };
-  store.catalog.push(book);
-  persist();
-  res.json({ id: book.id, title, author, mime, size: req.file.size, free });
+app.post("/api/catalog/upload", auth, bookUpload, (req, res) => {
+  const file = req.files && req.files.file && req.files.file[0];
+  const coverF = req.files && req.files.cover && req.files.cover[0];
+  if (!isAdmin(req.user)) { if (file) fs.unlink(file.path, () => {}); if (coverF) fs.unlink(coverF.path, () => {}); return res.status(403).json({ error: "forbidden" }); }
+  if (!file) { if (coverF) fs.unlink(coverF.path, () => {}); return res.status(400).json({ error: "Поддерживаются .txt, .epub, .pdf, .fb2, .docx до 40 МБ" }); }
+  const ext = path.extname(file.originalname).toLowerCase();
+  const book = {
+    id: store.catalogSeq++,
+    title: (req.body.title || file.originalname.replace(/\.[^.]+$/, "")).slice(0, 200),
+    author: (req.body.author || "").slice(0, 120),
+    category: (req.body.category || "").slice(0, 60),
+    filename: file.filename, cover: coverF ? coverF.filename : null,
+    mime: mimeFor(ext), kind: kindFor(ext), size: file.size,
+    free: req.body.free === "1" || req.body.free === "true", created: now(),
+  };
+  store.catalog.push(book); persist();
+  res.json(pick(book));
+});
+
+// обложка книги каталога
+app.post("/api/catalog/cover/:id", auth, (req, res) => {
+  const book = store.catalog.find((b) => b.id === +req.params.id);
+  if (!book || !book.cover) return res.status(404).end();
+  const fp = path.join(UPLOAD_DIR, book.cover);
+  if (!fs.existsSync(fp)) return res.status(404).end();
+  fs.createReadStream(fp).pipe(res);
 });
 
 // содержимое книги из каталога — нужна подписка (кроме помеченных free)
@@ -241,6 +271,7 @@ app.post("/api/catalog/delete/:id", auth, (req, res) => {
   const i = store.catalog.findIndex((b) => b.id === +req.params.id);
   if (i >= 0) {
     fs.unlink(path.join(UPLOAD_DIR, store.catalog[i].filename), () => {});
+    if (store.catalog[i].cover) fs.unlink(path.join(UPLOAD_DIR, store.catalog[i].cover), () => {});
     store.catalog.splice(i, 1);
     persist();
   }
