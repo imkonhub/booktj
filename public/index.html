@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-app-theme="light">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
@@ -9,97 +9,90 @@
 <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;1,400&family=PT+Serif:wght@400;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F4F4F2; --card:#FFFFFF; --ink:#18181B; --muted:#86868C; --line:#ECECEC;
+    --bg:#F4F4F2; --card:#FFFFFF; --soft:#EAEAE8; --ink:#18181B; --muted:#86868C; --line:#ECECEC;
     --accent:#5B54E8; --accent-2:#8B5CF6;
     --ui:"Plus Jakarta Sans",system-ui,sans-serif; --serif:"Lora",Georgia,serif; --sans:"Inter",system-ui,sans-serif;
     --r-bg:#FFFFFF; --r-ink:#1B1B1F; --r-muted:#9A9AA2; --r-line:#EFEFEF; --r-font:var(--serif); --r-fs:19px; --r-lh:1.75;
   }
+  [data-app-theme="dark"]{ --bg:#0E0E11; --card:#1A1A1F; --soft:#222228; --ink:#ECECF0; --muted:#8E8E96; --line:#2A2A31; }
   [data-rtheme="cream"]{--r-bg:#F7EFDD;--r-ink:#3B2F1E;--r-muted:#A8997C;--r-line:#E7DcC4;}
   [data-rtheme="sepia"]{--r-bg:#E9DCC2;--r-ink:#473826;--r-muted:#94815F;--r-line:#D8C9A8;}
   [data-rtheme="dark"]{--r-bg:#16161A;--r-ink:#DAD8E0;--r-muted:#76757E;--r-line:#28282E;}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{margin:0;height:100%;}
-  body{background:var(--bg);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased;overscroll-behavior-y:none;transition:background .3s,color .3s;}
   .screen{display:none;min-height:100dvh;} .screen.active{display:block;}
   button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
   .pressable{transition:transform .12s ease;} .pressable:active{transform:scale(.97);}
 
   #app{padding:calc(16px + env(safe-area-inset-top)) 18px calc(36px + env(safe-area-inset-bottom));max-width:560px;margin:0 auto;}
-  .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+  .head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
   .head small{display:block;font-size:12px;color:var(--muted);font-weight:500;}
   .head h1{font-size:25px;font-weight:700;margin:1px 0 0;letter-spacing:-.02em;}
   .hgroup{display:flex;gap:8px;align-items:center;}
   .badge{font-size:12px;font-weight:600;padding:7px 13px;border-radius:30px;}
   .badge.pro{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff;}
-  .badge.free{background:#fff;color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent);}
-  .menu-btn{width:40px;height:40px;border-radius:12px;background:#fff;display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  .badge.free{background:var(--card);color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent);}
+  .menu-btn{width:40px;height:40px;border-radius:12px;background:var(--card);display:grid;place-items:center;box-shadow:0 1px 4px rgba(0,0,0,.08);}
   .menu-btn svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.9;stroke-linecap:round;}
 
-  .tabs{display:flex;gap:6px;background:#EAEAE8;border-radius:14px;padding:4px;margin-bottom:16px;}
+  .tabs{display:flex;gap:6px;background:var(--soft);border-radius:14px;padding:4px;margin-bottom:12px;}
   .tabs button{flex:1;font-size:14px;font-weight:600;padding:10px;border-radius:11px;color:var(--muted);}
-  .tabs button.on{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06);}
+  .tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06);}
+  .searchbar{display:flex;gap:8px;margin-bottom:12px;}
+  .searchbar input{flex:1;border:1.5px solid var(--line);border-radius:12px;padding:10px 13px;font-size:14px;font-family:var(--ui);background:var(--card);color:var(--ink);}
+  .searchbar select{border:1.5px solid var(--line);border-radius:12px;padding:0 8px;font-size:13px;font-weight:600;background:var(--card);color:var(--ink);}
 
   .cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none;}
   .cats::-webkit-scrollbar{display:none;}
-  .cats button{flex:0 0 auto;font-size:13px;font-weight:600;padding:8px 14px;border-radius:30px;background:#fff;color:var(--muted);box-shadow:inset 0 0 0 1px var(--line);}
-  .cats button.on{background:var(--ink);color:#fff;box-shadow:none;}
+  .cats button{flex:0 0 auto;font-size:13px;font-weight:600;padding:8px 14px;border-radius:30px;background:var(--card);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line);}
+  .cats button.on{background:var(--ink);color:var(--bg);box-shadow:none;}
 
-  .hero{display:flex;gap:16px;align-items:center;background:var(--card);border-radius:20px;padding:16px;margin-bottom:20px;box-shadow:0 4px 20px rgba(0,0,0,.05);text-align:left;width:100%;}
+  .hero{display:flex;gap:16px;align-items:center;background:var(--card);border-radius:20px;padding:16px;margin-bottom:18px;box-shadow:0 4px 20px rgba(0,0,0,.06);text-align:left;width:100%;}
   .hero .mini{width:62px;height:88px;border-radius:10px;flex:0 0 62px;display:flex;align-items:flex-end;padding:8px;box-shadow:0 6px 16px rgba(0,0,0,.18);background-size:cover;background-position:center;}
   .hero .mini b{font-size:11px;font-weight:700;color:#fff;line-height:1.1;text-shadow:0 1px 2px rgba(0,0,0,.4);}
-  .hero .mini.hascover{background-size:contain;background-repeat:no-repeat;background-color:#14141A;}
-  .hero .mini.hascover b{display:none;}
-  .hero .info{flex:1;min-width:0;}
-  .hero .info .lbl{font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;}
+  .hero .info{flex:1;min-width:0;} .hero .info .lbl{font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.04em;text-transform:uppercase;}
   .hero .info h3{font-size:17px;font-weight:600;margin:3px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .hero .info p{font-size:13px;color:var(--muted);margin:0;}
-  .ring{position:relative;width:46px;height:46px;flex:0 0 46px;}
-  .ring svg{transform:rotate(-90deg);} .ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;font-weight:700;}
+  .ring{position:relative;width:46px;height:46px;flex:0 0 46px;} .ring svg{transform:rotate(-90deg);} .ring span{position:absolute;inset:0;display:grid;place-items:center;font-size:12px;font-weight:700;}
 
-  .upload{display:flex;align-items:center;gap:14px;width:100%;background:var(--card);border:1.5px dashed #D8D8D6;border-radius:18px;padding:15px;margin-bottom:16px;text-align:left;}
+  .upload{display:flex;align-items:center;gap:14px;width:100%;background:var(--card);border:1.5px dashed var(--line);border-radius:18px;padding:15px;margin-bottom:16px;text-align:left;}
   .upload .ic{width:44px;height:44px;border-radius:13px;background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff;display:grid;place-items:center;font-size:26px;flex:0 0 44px;}
   .upload b{font-size:15px;font-weight:600;display:block;} .upload span{font-size:12.5px;color:var(--muted);}
 
   .shelf{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
   @media(max-width:430px){.shelf{grid-template-columns:repeat(2,1fr);}}
   .bk{text-align:left;width:100%;}
-  .bk .cov{aspect-ratio:2/3;border-radius:13px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;position:relative;box-shadow:0 8px 20px rgba(0,0,0,.14);background-size:cover;background-position:center;overflow:hidden;}
+  .bk .cov{aspect-ratio:2/3;border-radius:13px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;position:relative;box-shadow:0 8px 20px rgba(0,0,0,.16);background-size:cover;background-position:center;overflow:hidden;}
   .bk .cov .top{display:flex;justify-content:space-between;align-items:flex-start;position:relative;z-index:2;}
   .bk .cov .tag{font-size:8px;font-weight:700;letter-spacing:.06em;background:rgba(0,0,0,.32);color:#fff;padding:3px 6px;border-radius:6px;}
-  .bk .cov .tag.free{background:#fff;color:#0F7A52;}
-  .bk .cov .lk{color:#fff;font-size:15px;}
+  .bk .cov .tag.free{background:#fff;color:#0F7A52;} .bk .cov .lk{color:#fff;font-size:15px;}
   .bk .cov .btxt{position:relative;z-index:2;}
   .bk .cov .ttl{font-size:14px;font-weight:700;color:#fff;line-height:1.18;text-shadow:0 1px 4px rgba(0,0,0,.4);}
   .bk .cov .ath{font-size:10.5px;color:rgba(255,255,255,.9);margin-top:3px;text-shadow:0 1px 3px rgba(0,0,0,.4);}
-  .bk .cov.hascover{background-size:contain;background-repeat:no-repeat;background-color:#14141A;}
-  .bk .cov.hascover .btxt{display:none;}
-  .bk .cov.hascover::after{display:none;}
-  .bk .pr{height:4px;background:var(--line);border-radius:4px;margin-top:9px;overflow:hidden;}
-  .bk .pr i{display:block;height:100%;background:var(--accent);border-radius:4px;}
+  .bk .cov.hascover::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),rgba(0,0,0,0) 55%);z-index:1;}
+  .bk .pr{height:4px;background:var(--line);border-radius:4px;margin-top:9px;overflow:hidden;} .bk .pr i{display:block;height:100%;background:var(--accent);border-radius:4px;}
   .bk .meta{font-size:11px;color:var(--muted);margin-top:6px;}
 
-  .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:38px 16px;font-size:14px;}
-  .empty .big{font-size:40px;color:#D5D5D8;margin-bottom:8px;}
+  .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:38px 16px;font-size:14px;} .empty .big{font-size:40px;opacity:.4;margin-bottom:8px;}
   .gate{text-align:center;padding:70px 28px;} .gate .big{font-size:46px;margin-bottom:12px;} .gate h2{font-size:21px;margin:0 0 6px;} .gate p{color:var(--muted);font-size:14px;}
 
-  #reader{display:none;background:var(--r-bg);color:var(--r-ink);transition:background .35s,color .35s;}
-  #reader.active{display:block;}
+  #reader{display:none;background:var(--r-bg);color:var(--r-ink);transition:background .35s,color .35s;} #reader.active{display:block;}
   .rprog{position:fixed;top:0;left:0;height:3px;background:var(--accent);z-index:30;width:0;transition:width .12s linear;}
-  .rbar{position:fixed;top:0;left:0;right:0;z-index:25;display:flex;align-items:center;gap:4px;padding:calc(9px + env(safe-area-inset-top)) 10px 9px;background:color-mix(in srgb,var(--r-bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:opacity .3s,transform .3s;}
+  .rbar{position:fixed;top:0;left:0;right:0;z-index:25;display:flex;align-items:center;gap:2px;padding:calc(9px + env(safe-area-inset-top)) 8px 9px;background:color-mix(in srgb,var(--r-bg) 88%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);transition:opacity .3s,transform .3s;}
   .rbar.hidden{opacity:0;transform:translateY(-100%);pointer-events:none;}
   .rbar .t{flex:1;min-width:0;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px;color:var(--r-ink);}
-  .ricon{width:42px;height:42px;display:grid;place-items:center;border-radius:12px;color:var(--r-ink);}
+  .ricon{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;color:var(--r-ink);flex:0 0 40px;}
   .ricon:active{background:color-mix(in srgb,var(--r-ink) 8%,transparent);}
-  .ricon svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
-  .aa{font-weight:700;font-size:19px;font-family:var(--serif);}
+  .ricon svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .aa{font-weight:700;font-size:18px;font-family:var(--serif);}
   #txtView{max-width:36rem;margin:0 auto;padding:calc(74px + env(safe-area-inset-top)) 26px calc(120px + env(safe-area-inset-bottom));font-family:var(--r-font);font-size:var(--r-fs);line-height:var(--r-lh);color:var(--r-ink);}
-  #txtView p{margin:0 0 1.05em;} #txtView p.ind{text-indent:1.4em;} #txtView h3{font-family:var(--ui);font-size:1.15em;margin:1.4em 0 .5em;} #txtView p.sub{color:var(--r-muted);font-style:italic;text-indent:0;} #txtView img{max-width:100%;height:auto;}
-  #epubArea{position:fixed;top:calc(58px + env(safe-area-inset-top));left:0;right:0;bottom:60px;}
+  #txtView p{margin:0 0 1.05em;} #txtView p.ind{text-indent:1.4em;} #txtView h3{font-family:var(--ui);font-size:1.15em;margin:1.4em 0 .5em;scroll-margin-top:80px;} #txtView p.sub{color:var(--r-muted);font-style:italic;text-indent:0;} #txtView img{max-width:100%;height:auto;}
+  #epubArea{position:fixed;top:calc(56px + env(safe-area-inset-top));left:0;right:0;bottom:58px;}
   #pdfView{padding:calc(70px + env(safe-area-inset-top)) 8px calc(110px + env(safe-area-inset-bottom));overflow-x:auto;text-align:center;}
   #pdfView canvas.pg{display:block;margin:0 auto 12px;box-shadow:0 4px 18px rgba(0,0,0,.16);border-radius:4px;background:#fff;max-width:none;}
   [data-rtheme="dark"] #pdfView canvas.pg{filter:invert(.92) hue-rotate(180deg);}
@@ -110,23 +103,27 @@
   #dimmer{position:fixed;inset:0;background:#000;opacity:0;z-index:24;pointer-events:none;transition:opacity .2s;}
 
   .scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;visibility:hidden;transition:opacity .28s;z-index:40;} .scrim.show{opacity:1;visibility:visible;}
-  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);color:var(--ink);border-radius:26px 26px 0 0;padding:8px 22px calc(26px + env(safe-area-inset-bottom));transform:translateY(103%);transition:transform .36s cubic-bezier(.22,1,.36,1);box-shadow:0 -12px 44px rgba(0,0,0,.2);max-width:560px;margin:0 auto;max-height:92dvh;overflow-y:auto;} .sheet.show{transform:translateY(0);}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:50;background:var(--card);color:var(--ink);border-radius:26px 26px 0 0;padding:8px 22px calc(26px + env(safe-area-inset-bottom));transform:translateY(103%);transition:transform .36s cubic-bezier(.22,1,.36,1);box-shadow:0 -12px 44px rgba(0,0,0,.25);max-width:560px;margin:0 auto;max-height:88dvh;overflow-y:auto;} .sheet.show{transform:translateY(0);}
   .grip{width:40px;height:4px;border-radius:3px;background:var(--line);margin:8px auto 18px;}
   .sheet h3{font-size:20px;font-weight:700;margin:0 0 16px;}
   .field{margin-bottom:14px;} .field label{font-size:12.5px;color:var(--muted);font-weight:500;display:block;margin-bottom:7px;}
   .field input[type=text],.field input[type=file]{width:100%;border:1.5px solid var(--line);border-radius:13px;padding:13px;font-size:15px;font-family:var(--ui);background:var(--bg);color:var(--ink);}
   .btn{width:100%;font-size:15.5px;font-weight:600;border-radius:15px;padding:15px;background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff;}
+  .btn.sec{background:var(--bg);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line);}
   .row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;}
   .row .lbl{font-size:13px;color:var(--muted);font-weight:500;flex:0 0 auto;}
   .seg{display:flex;background:var(--bg);border-radius:13px;padding:4px;gap:4px;flex:1;}
-  .seg button{flex:1;font-size:13px;font-weight:600;padding:10px 6px;border-radius:10px;color:var(--muted);} .seg button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.08);}
-  .themes{display:flex;gap:10px;margin-bottom:18px;} .themes button{flex:1;height:54px;border-radius:14px;display:grid;place-items:center;font-size:13px;font-weight:600;box-shadow:inset 0 0 0 2px transparent;} .themes button.on{box-shadow:inset 0 0 0 2.5px var(--accent);}
+  .seg button{flex:1;font-size:12.5px;font-weight:600;padding:10px 4px;border-radius:10px;color:var(--muted);} .seg button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.1);}
+  .themes{display:flex;gap:10px;margin-bottom:18px;} .themes button{flex:1;height:52px;border-radius:14px;display:grid;place-items:center;font-size:13px;font-weight:600;box-shadow:inset 0 0 0 2px transparent;} .themes button.on{box-shadow:inset 0 0 0 2.5px var(--accent);}
   .th-light{background:#fff;color:#1b1b1f;border:1px solid #eee;}.th-cream{background:#F7EFDD;color:#3B2F1E;}.th-sepia{background:#E9DCC2;color:#473826;}.th-dark{background:#16161A;color:#DAD8E0;}
   input[type=range]{width:100%;accent-color:var(--accent);}
-  .profile{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
-  .profile .av{width:54px;height:54px;border-radius:50%;background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700;}
-  .profile b{font-size:17px;font-weight:700;display:block;} .profile span{font-size:13px;color:var(--muted);}
+  .profile{display:flex;align-items:center;gap:14px;margin-bottom:16px;} .profile .av{width:54px;height:54px;border-radius:50%;background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff;display:grid;place-items:center;font-size:22px;font-weight:700;} .profile b{font-size:17px;font-weight:700;display:block;} .profile span{font-size:13px;color:var(--muted);}
   .stat-row{display:flex;gap:12px;margin-bottom:16px;} .stat{flex:1;background:var(--bg);border-radius:14px;padding:14px;text-align:center;} .stat b{font-size:22px;font-weight:700;display:block;} .stat span{font-size:12px;color:var(--muted);}
+  .nav-tabs{display:flex;gap:6px;background:var(--bg);border-radius:13px;padding:4px;margin-bottom:14px;} .nav-tabs button{flex:1;font-size:13px;font-weight:600;padding:9px;border-radius:10px;color:var(--muted);} .nav-tabs button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 6px rgba(0,0,0,.08);}
+  .nav-list{max-height:46dvh;overflow-y:auto;margin-bottom:12px;}
+  .nav-list .it{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:12px 4px;border-bottom:1px solid var(--line);font-size:14px;}
+  .nav-list .it span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;} .nav-list .it small{color:var(--muted);font-size:12px;}
+  .nav-list .it .x{color:var(--muted);font-size:18px;padding:2px 6px;}
   .menu-item{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 4px;border-top:1px solid var(--line);font-size:15px;font-weight:500;} .menu-item svg{width:20px;height:20px;stroke:var(--muted);fill:none;stroke-width:1.8;}
   .pay-hero{text-align:center;padding:4px 0;} .pay-hero .ic{width:60px;height:60px;margin:0 auto 10px;border-radius:18px;background:linear-gradient(120deg,var(--accent),var(--accent-2));display:grid;place-items:center;} .pay-hero .ic svg{width:30px;height:30px;stroke:#fff;fill:none;stroke-width:2;}
   .pay-hero h3{font-size:22px;margin:0;} .pay-hero .price{font-size:30px;font-weight:700;margin-top:4px;} .pay-hero .price small{font-size:14px;color:var(--muted);font-weight:500;}
@@ -142,12 +139,10 @@
   <section id="app" class="screen">
     <div class="head">
       <div><small>Читалка</small><h1>Библиотека</h1></div>
-      <div class="hgroup">
-        <button id="planBadge" class="badge free pressable">Премиум</button>
-        <button id="menuBtn" class="menu-btn pressable" aria-label="Меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
-      </div>
+      <div class="hgroup"><button id="planBadge" class="badge free pressable">Премиум</button><button id="menuBtn" class="menu-btn pressable" aria-label="Меню"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button></div>
     </div>
     <div class="tabs"><button id="tabLib" class="on">Мои книги</button><button id="tabCat">Каталог</button></div>
+    <div class="searchbar"><input id="searchInput" type="text" placeholder="Поиск по названию или автору" /><select id="sortSel"><option value="recent">Недавние</option><option value="title">А–Я</option><option value="progress">Прогресс</option></select></div>
 
     <div id="tabLibContent">
       <button id="hero" class="hero pressable" style="display:none"></button>
@@ -169,6 +164,7 @@
     <header class="rbar" id="rbar">
       <button class="ricon" id="backBtn" aria-label="Назад"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
       <div class="t" id="rtitle">Книга</div>
+      <button class="ricon" id="tocBtn" aria-label="Оглавление" style="display:none"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg></button>
       <button class="ricon" id="delBtn" aria-label="Удалить" style="display:none"><svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V5h6v2M6 7l1 13h10l1-13"/></svg></button>
       <button class="ricon" id="aaBtn" aria-label="Оформление"><span class="aa">Aa</span></button>
     </header>
@@ -181,38 +177,44 @@
   <div class="scrim" id="scrim"></div>
 
   <div class="sheet" id="uploadSheet">
-    <div class="grip"></div>
-    <h3 id="upTitle">Новая книга</h3>
+    <div class="grip"></div><h3 id="upTitle">Новая книга</h3>
     <div class="field"><label>Файл</label><input type="file" id="fileInput" accept=".txt,.epub,.pdf,.fb2,.docx" /></div>
     <div class="field"><label>Обложка (картинка, необязательно)</label><input type="file" id="coverInput" accept="image/*" /></div>
     <div class="field"><label>Название</label><input type="text" id="titleInput" placeholder="Из имени файла" /></div>
     <div class="field"><label>Автор</label><input type="text" id="authorInput" placeholder="—" /></div>
     <div class="field"><label>Категория</label><input type="text" id="catInput" list="catList" placeholder="Например: Фантастика" />
-      <datalist id="catList"><option value="Художественная"><option value="Фантастика"><option value="Детектив"><option value="Научпоп"><option value="Бизнес"><option value="Учёба"><option value="Поэзия"><option value="Другое"></datalist>
-    </div>
+      <datalist id="catList"><option value="Художественная"><option value="Фантастика"><option value="Детектив"><option value="Научпоп"><option value="Бизнес"><option value="Учёба"><option value="Поэзия"><option value="Другое"></datalist></div>
     <label id="freeRow" style="display:none;align-items:center;gap:10px;margin-bottom:16px;font-size:14px;font-weight:500;"><input type="checkbox" id="catFree" style="width:20px;height:20px;accent-color:var(--accent)" /> Доступна бесплатно</label>
     <button class="btn" id="doUpload">Добавить</button>
   </div>
 
   <div class="sheet" id="aaSheet">
-    <div class="grip"></div>
-    <h3>Оформление</h3>
+    <div class="grip"></div><h3>Оформление</h3>
     <div class="themes" id="themes"><button class="th-light on" data-rt="light">Свет</button><button class="th-cream" data-rt="cream">Крем</button><button class="th-sepia" data-rt="sepia">Сепия</button><button class="th-dark" data-rt="dark">Ночь</button></div>
     <div id="textOpts">
       <div class="row"><span class="lbl">Размер</span><div class="seg" id="fsSeg"><button data-fs="16">A−</button><button data-fs="19" class="on">A</button><button data-fs="22">A+</button><button data-fs="25">A++</button></div></div>
-      <div class="row"><span class="lbl">Шрифт</span><div class="seg" id="fontSeg"><button data-font="serif" class="on">С засечками</button><button data-font="sans">Гротеск</button></div></div>
+      <div class="row"><span class="lbl">Шрифт</span><div class="seg" id="fontSeg"><button data-font="serif" class="on">Lora</button><button data-font="ptserif">PT Serif</button><button data-font="sans">Inter</button></div></div>
       <div class="row"><span class="lbl">Интервал</span><div class="seg" id="lhSeg"><button data-lh="1.5">Плотно</button><button data-lh="1.75" class="on">Обычно</button><button data-lh="2">Просторно</button></div></div>
+      <div class="row"><span class="lbl">Листание</span><div class="seg" id="pageSeg"><button data-pm="scroll" class="on">Прокрутка</button><button data-pm="page">Страницы</button></div></div>
     </div>
     <div class="row" style="margin-top:6px"><span class="lbl">Яркость</span><input type="range" id="bright" min="45" max="100" value="100" step="1" /></div>
+  </div>
+
+  <div class="sheet" id="navSheet">
+    <div class="grip"></div>
+    <div class="nav-tabs"><button id="ntToc" class="on">Оглавление</button><button id="ntBm">Закладки</button></div>
+    <div class="nav-list" id="navList"></div>
+    <button class="btn sec" id="addBmBtn" style="margin-bottom:8px">＋ Добавить закладку здесь</button>
+    <button class="btn sec" id="markDoneBtn">Отметить прочитанной</button>
   </div>
 
   <div class="sheet" id="menuSheet">
     <div class="grip"></div>
     <div class="profile"><div class="av" id="mAv">U</div><div><b id="mName">—</b><span id="mPlan">Бесплатный план</span></div></div>
     <div class="stat-row"><div class="stat"><b id="sBooks">0</b><span>книг</span></div><div class="stat"><b id="sReading">0</b><span>читаю</span></div><div class="stat"><b id="sDone">0</b><span>дочитано</span></div></div>
-    <button class="btn" id="mSub" style="margin-bottom:8px">Оформить премиум</button>
-    <button class="menu-item" id="mDefaultTheme"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v18"/></svg> Тема чтения по умолчанию</button>
-    <div class="menu-item" style="color:var(--muted);font-weight:400;font-size:13px;display:block"><b style="display:block;color:var(--ink);font-size:14px;margin-bottom:2px">О приложении</b>Читалка для Telegram. Поддерживает TXT, EPUB, PDF, FB2 и DOCX. Свои книги приватны, каталог — общий.</div>
+    <button class="btn" id="mSub" style="margin-bottom:14px">Оформить премиум</button>
+    <div class="row"><span class="lbl">Тема приложения</span><div class="seg" id="appThemeSeg"><button data-at="light">Светлая</button><button data-at="dark">Тёмная</button><button data-at="auto">Авто</button></div></div>
+    <div class="menu-item" style="color:var(--muted);font-weight:400;font-size:13px;display:block"><b style="display:block;color:var(--ink);font-size:14px;margin-bottom:2px">О приложении</b>Читалка для Telegram. Форматы TXT, EPUB, PDF, FB2, DOCX. Темы, листание страницами, оглавление и закладки. Свои книги приватны, каталог — общий.</div>
   </div>
 
   <div class="sheet" id="paySheet">
@@ -230,8 +232,9 @@ const W = window.Telegram && window.Telegram.WebApp;
 const INIT = W ? W.initData : "";
 const $ = s => document.querySelector(s); const $$ = s => document.querySelectorAll(s);
 let STATE = { premium:false, books:[], catalog:[], starPrice:150, freeLimit:3, isAdmin:false, user:{} };
-let PREFS = { rtheme:'light', font:'serif', fs:19, lh:1.75, bright:100 };
-let libFilter='', catFilter='';
+let PREFS = { rtheme:'light', font:'serif', fs:19, lh:1.75, bright:100, pageMode:'scroll', appTheme:'light' };
+let libFilter='', catFilter='', query='', sortBy='recent';
+const FONTS = { serif:'var(--serif)', ptserif:'"PT Serif",Georgia,serif', sans:'var(--sans)' };
 if (window.pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
 
 function tgReady(){ if(W){ try{ W.ready(); W.expand(); }catch(e){} } }
@@ -241,8 +244,11 @@ function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show')
 function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 async function api(p,o={}){ return fetch(p,{method:'POST',headers:Object.assign({'X-Init-Data':INIT},o.json?{'Content-Type':'application/json'}:{}),body:o.json?JSON.stringify(o.json):o.body}); }
 
-function loadPrefs(){ return new Promise(res=>{ if(W&&W.CloudStorage&&W.CloudStorage.getItem){ try{ W.CloudStorage.getItem('prefs',(e,v)=>{ if(v){try{PREFS=Object.assign(PREFS,JSON.parse(v));}catch{}} res(); }); return; }catch(e){} } if(W&&W.colorScheme==='dark') PREFS.rtheme='dark'; res(); }); }
+function loadPrefs(){ return new Promise(res=>{ if(W&&W.CloudStorage&&W.CloudStorage.getItem){ try{ W.CloudStorage.getItem('prefs',(e,v)=>{ if(v){try{PREFS=Object.assign(PREFS,JSON.parse(v));}catch{}} res(); }); return; }catch(e){} } if(W&&W.colorScheme==='dark'){PREFS.rtheme='dark';} res(); }); }
 function savePrefs(){ try{ W&&W.CloudStorage&&W.CloudStorage.setItem&&W.CloudStorage.setItem('prefs',JSON.stringify(PREFS)); }catch(e){} }
+
+function resolveApp(){ if(PREFS.appTheme==='dark')return'dark'; if(PREFS.appTheme==='light')return'light'; const h=new Date().getHours(); return ((W&&W.colorScheme==='dark')||h>=19||h<7)?'dark':'light'; }
+function applyAppTheme(){ document.documentElement.dataset.appTheme=resolveApp(); $$('#appThemeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.at===(PREFS.appTheme||'light'))); }
 
 function hue(s){ let h=0; for(let i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%360; return h; }
 function cover(b){ const h=hue(b.title+(b.author||'')); return `linear-gradient(150deg,hsl(${h} 62% 56%),hsl(${(h+40)%360} 64% 42%))`; }
@@ -250,8 +256,8 @@ const KIND={txt:'TXT',epub:'EPUB',pdf:'PDF',fb2:'FB2',docx:'DOCX'};
 
 async function loadLibrary(){
   $('#libBody').innerHTML='<div class="spin"></div>'; $('#shelf').innerHTML=''; $('#catShelf').innerHTML=''; $('#hero').style.display='none';
-  let res; try{ res=await api('/api/me'); }catch(e){ $('#libBody').innerHTML='<div class="empty">Нет связи с сервером.</div>'; return; }
-  if(res.status===401){ $('#libBody').innerHTML='<div class="gate"><div class="big">📖</div><h2>Откройте в Telegram</h2><p>Приложение работает внутри Telegram — запустите его кнопкой бота.</p></div>'; $('#tabLibContent').style.display='none'; $('#tabCatContent').style.display='none'; $('.tabs').style.display='none'; $('.hgroup').style.display='none'; return; }
+  let res; try{ res=await api('/api/me'); }catch(e){ $('#libBody').innerHTML='<div class="empty">Нет связи с сервером. Подождите — бесплатный сервер мог «уснуть», первый запуск до минуты.</div>'; return; }
+  if(res.status===401){ $('#libBody').innerHTML='<div class="gate"><div class="big">📖</div><h2>Откройте в Telegram</h2><p>Приложение работает внутри Telegram — запустите его кнопкой бота.</p></div>'; $('#tabLibContent').style.display='none'; $('#tabCatContent').style.display='none'; $('.tabs').style.display='none'; $('.searchbar').style.display='none'; $('.hgroup').style.display='none'; return; }
   const d=await res.json(); STATE=d; $('#libBody').innerHTML='';
   const badge=$('#planBadge'); badge.className='badge pressable '+(d.premium?'pro':'free'); badge.textContent=d.premium?'Премиум ✦':'Премиум';
   $('#uploadHint').textContent=d.premium?'TXT, EPUB, PDF, FB2, DOCX · безлимит':`TXT, EPUB, PDF, FB2, DOCX · ${d.books.length}/${d.freeLimit}`;
@@ -262,11 +268,18 @@ async function loadLibrary(){
   renderCats('#catCats', d.catalog, catFilter, v=>{catFilter=v; loadShelf();});
   loadShelf();
 }
+function applyView(list, filter){
+  let a=list.filter(b=>(!filter||b.category===filter));
+  if(query){ const q=query.toLowerCase(); a=a.filter(b=>(b.title+' '+(b.author||'')).toLowerCase().includes(q)); }
+  if(sortBy==='title') a=a.slice().sort((x,y)=>x.title.localeCompare(y.title,'ru'));
+  else if(sortBy==='progress') a=a.slice().sort((x,y)=>(y.progress||0)-(x.progress||0));
+  return a;
+}
 function loadShelf(){
-  const lb=STATE.books.filter(b=>!libFilter||b.category===libFilter);
-  $('#shelf').innerHTML=''; if(!lb.length){ $('#shelf').innerHTML='<div class="empty"><div class="big">✦</div>Здесь появятся ваши книги.<br>Загрузите первую ↑</div>'; } else lb.forEach(b=>$('#shelf').appendChild(card(b,'lib')));
-  const cb=STATE.catalog.filter(b=>!catFilter||b.category===catFilter);
-  $('#catShelf').innerHTML=''; if(!cb.length){ $('#catShelf').innerHTML='<div class="empty"><div class="big">✦</div>Каталог пуст'+(STATE.isAdmin?'. Добавьте книгу ↑':'.')+'</div>'; } else cb.forEach(b=>$('#catShelf').appendChild(card(b,'catalog')));
+  const lb=applyView(STATE.books, libFilter);
+  $('#shelf').innerHTML=''; if(!lb.length){ $('#shelf').innerHTML='<div class="empty"><div class="big">✦</div>'+(query?'Ничего не найдено':'Здесь появятся ваши книги.<br>Загрузите первую ↑')+'</div>'; } else lb.forEach(b=>$('#shelf').appendChild(card(b,'lib')));
+  const cb=applyView(STATE.catalog, catFilter);
+  $('#catShelf').innerHTML=''; if(!cb.length){ $('#catShelf').innerHTML='<div class="empty"><div class="big">✦</div>'+(query?'Ничего не найдено':'Каталог пуст'+(STATE.isAdmin?'. Добавьте книгу ↑':'.'))+'</div>'; } else cb.forEach(b=>$('#catShelf').appendChild(card(b,'catalog')));
 }
 function renderCats(sel, list, current, onPick){
   const box=$(sel); const cats=[...new Set(list.map(b=>b.category).filter(Boolean))];
@@ -277,8 +290,7 @@ function renderCats(sel, list, current, onPick){
 function renderHero(b){
   const h=$('#hero'); h.style.display='flex'; const pct=Math.round(b.progress*100); const c=2*Math.PI*20, off=c*(1-b.progress);
   h.innerHTML=`<div class="mini" id="heroCov" style="background:${cover(b)}"><b>${esc(b.title)}</b></div><div class="info"><div class="lbl">Продолжить</div><h3>${esc(b.title)}</h3><p>${esc(b.author||KIND[b.kind]||'')}</p></div><div class="ring"><svg width="46" height="46"><circle cx="23" cy="23" r="20" fill="none" stroke="var(--line)" stroke-width="4"/><circle cx="23" cy="23" r="20" fill="none" stroke="var(--accent)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg><span>${pct}%</span></div>`;
-  h.onclick=()=>openBook(b,'lib');
-  if(b.hasCover) fetchCover($('#heroCov'),'lib',b.id);
+  h.onclick=()=>openBook(b,'lib'); if(b.hasCover) fetchCover($('#heroCov'),'lib',b.id);
 }
 function card(b, source){
   const el=document.createElement('button'); el.className='bk pressable';
@@ -288,36 +300,33 @@ function card(b, source){
     ? `<div class="pr"><i style="width:${Math.round((b.progress||0)*100)}%"></i></div><div class="meta">${Math.round((b.progress||0)*100)}% · ${esc(b.category||KIND[b.kind])}</div>`
     : `<div class="meta">${b.free?'Бесплатно':'По подписке'}${b.category?' · '+esc(b.category):''}</div>`;
   el.innerHTML=`<div class="cov" style="background:${cover(b)}"><div class="top">${corner}${lock}</div><div class="btxt"><div class="ttl">${esc(b.title)}</div>${b.author?`<div class="ath">${esc(b.author)}</div>`:''}</div></div>${bottom}`;
-  el.onclick=()=>openBook(b,source);
-  if(b.hasCover) fetchCover(el.querySelector('.cov'),source,b.id);
+  el.onclick=()=>openBook(b,source); if(b.hasCover) fetchCover(el.querySelector('.cov'),source,b.id);
   return el;
 }
-async function fetchCover(covEl, source, id){
-  try{ const r=await api((source==='catalog'?'/api/catalog/cover/':'/api/cover/')+id); if(!r.ok) return; const blob=await r.blob(); covEl.style.backgroundImage=`url(${URL.createObjectURL(blob)})`; covEl.classList.add('hascover'); }catch{}
-}
+async function fetchCover(covEl, source, id){ try{ const r=await api((source==='catalog'?'/api/catalog/cover/':'/api/cover/')+id); if(!r.ok) return; const blob=await r.blob(); covEl.style.backgroundImage=`url(${URL.createObjectURL(blob)})`; covEl.classList.add('hascover'); }catch{} }
 
 $('#tabLib').onclick=()=>tab('lib'); $('#tabCat').onclick=()=>tab('cat');
 function tab(t){ $('#tabLib').classList.toggle('on',t==='lib'); $('#tabCat').classList.toggle('on',t==='cat'); $('#tabLibContent').style.display=t==='lib'?'block':'none'; $('#tabCatContent').style.display=t==='cat'?'block':'none'; selH(); }
+$('#searchInput').oninput=e=>{ query=e.target.value.trim(); loadShelf(); };
+$('#sortSel').onchange=e=>{ sortBy=e.target.value; loadShelf(); };
 
 $('#menuBtn').onclick=()=>{
   const u=STATE.user||{}; $('#mAv').textContent=(u.name||'U').slice(0,1).toUpperCase(); $('#mName').textContent=u.name||'Читатель';
   if(STATE.premium){ const dt=STATE.premiumUntil?new Date(STATE.premiumUntil*1000).toLocaleDateString('ru-RU'):''; $('#mPlan').textContent='Премиум активен'+(dt?' до '+dt:''); $('#mSub').textContent='Подписка активна'; }
   else { $('#mPlan').textContent='Бесплатный план'; $('#mSub').textContent='Оформить премиум'; }
-  $('#sBooks').textContent=STATE.books.length;
-  $('#sReading').textContent=STATE.books.filter(b=>b.progress>0.001&&b.progress<0.999).length;
-  $('#sDone').textContent=STATE.books.filter(b=>b.progress>=0.999).length;
+  $('#sBooks').textContent=STATE.books.length; $('#sReading').textContent=STATE.books.filter(b=>b.progress>0.001&&b.progress<0.999).length; $('#sDone').textContent=STATE.books.filter(b=>b.progress>=0.999).length;
+  $$('#appThemeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.at===(PREFS.appTheme||'light')));
   openSheet('#menuSheet');
 };
 $('#mSub').onclick=()=>{ if(!STATE.premium){ closeSheets(); openPaywall(); } };
-$('#mDefaultTheme').onclick=()=>{ const order=['light','cream','sepia','dark']; PREFS.rtheme=order[(order.indexOf(PREFS.rtheme)+1)%4]; savePrefs(); toast('Тема по умолчанию: '+({light:'Свет',cream:'Крем',sepia:'Сепия',dark:'Ночь'}[PREFS.rtheme])); };
+$$('#appThemeSeg button').forEach(b=>b.onclick=()=>{ PREFS.appTheme=b.dataset.at; applyAppTheme(); savePrefs(); selH(); });
 
 let upMode='lib';
 $('#uploadBtn').onclick=()=>{ if(!STATE.premium && STATE.books.length>=STATE.freeLimit){ openPaywall(); return; } upMode='lib'; $('#upTitle').textContent='Новая книга'; $('#doUpload').textContent='Добавить'; $('#freeRow').style.display='none'; openSheet('#uploadSheet'); };
 $('#catUploadBtn').onclick=()=>{ upMode='catalog'; $('#upTitle').textContent='Книга в каталог'; $('#doUpload').textContent='Добавить в каталог'; $('#freeRow').style.display='flex'; openSheet('#uploadSheet'); };
 $('#doUpload').onclick=async()=>{
   const f=$('#fileInput').files[0]; if(!f){ toast('Выберите файл'); return; }
-  const fd=new FormData(); fd.append('file',f);
-  if($('#coverInput').files[0]) fd.append('cover',$('#coverInput').files[0]);
+  const fd=new FormData(); fd.append('file',f); if($('#coverInput').files[0]) fd.append('cover',$('#coverInput').files[0]);
   fd.append('title',$('#titleInput').value); fd.append('author',$('#authorInput').value); fd.append('category',$('#catInput').value);
   const ep=upMode==='catalog'?'/api/catalog/upload':'/api/upload'; if(upMode==='catalog') fd.append('free',$('#catFree').checked?'1':'0');
   const btn=$('#doUpload'); const lab=btn.textContent; btn.textContent='Загрузка…'; btn.disabled=true;
@@ -328,12 +337,13 @@ $('#doUpload').onclick=async()=>{
   closeSheets(); haptic('medium'); toast('Книга добавлена'); loadLibrary();
 };
 
-let rendition=null, epubBook=null, curBook=null, curSource='lib', pdfDoc=null, pdfIO=null, mode=null, pdfZoom=1;
+/* ---------- Reader ---------- */
+let rendition=null, epubBook=null, curBook=null, curSource='lib', pdfDoc=null, pdfIO=null, mode=null, pdfZoom=1, curToc=[];
 async function openBook(b, source='lib'){
   if(source==='catalog' && !b.free && !STATE.premium && !STATE.isAdmin){ openPaywall(); return; }
-  curBook=b; curSource=source; pdfZoom=1;
+  curBook=b; curSource=source; pdfZoom=1; curToc=[];
   $('#app').classList.remove('active'); $('#reader').classList.add('active');
-  $('#rtitle').textContent=b.title; $('#delBtn').style.display=source==='lib'?'grid':'none';
+  $('#rtitle').textContent=b.title; $('#delBtn').style.display=source==='lib'?'grid':'none'; $('#tocBtn').style.display='none';
   $('#rbar').classList.remove('hidden'); $('#enav').classList.remove('hidden');
   W && W.BackButton && (W.BackButton.show(), W.BackButton.onClick(back));
   $('#txtView').innerHTML=''; $('#txtView').style.display='none'; $('#epubArea').innerHTML=''; $('#epubArea').style.display='none';
@@ -357,20 +367,20 @@ function fb2ToHtml(buf){
   let xml; try{ xml=new TextDecoder(enc).decode(buf);}catch{ xml=new TextDecoder('utf-8').decode(buf);}
   const doc=new DOMParser().parseFromString(xml,'application/xml'); const body=doc.querySelector('body'); if(!body) return '<p>Не удалось прочитать FB2.</p>';
   let html=''; (function walk(node){ node.childNodes.forEach(n=>{ if(n.nodeType!==1)return; const t=n.tagName.toLowerCase();
-    if(t==='title'){ html+=`<h3>${esc(n.textContent.trim())}</h3>`; }
-    else if(t==='subtitle'){ html+=`<p class="sub">${esc(n.textContent.trim())}</p>`; }
-    else if(t==='p'){ html+=`<p class="ind">${esc(n.textContent.trim())}</p>`; }
-    else if(t==='empty-line'){ html+='<br>'; }
-    else walk(n); }); })(body);
+    if(t==='title'){ html+=`<h3>${esc(n.textContent.trim())}</h3>`; } else if(t==='subtitle'){ html+=`<p class="sub">${esc(n.textContent.trim())}</p>`; }
+    else if(t==='p'){ html+=`<p class="ind">${esc(n.textContent.trim())}</p>`; } else if(t==='empty-line'){ html+='<br>'; } else walk(n); }); })(body);
   return html||'<p>(пусто)</p>';
 }
-function openFlow(html,b){ mode='flow'; $('#txtView').style.display='block'; $('#txtView').innerHTML=html; requestAnimationFrame(()=>{ scrollToRatio(b.progress||0); updateScroll(); }); }
-async function openDocx(buf,b){ mode='flow'; $('#txtView').style.display='block'; $('#txtView').innerHTML='<div class="spin"></div>';
+function buildFlowToc(){ curToc=[]; $$('#txtView h3').forEach((h,i)=>{ h.id='h'+i; curToc.push({label:h.textContent.trim()||('Раздел '+(i+1)), target:'h'+i}); }); $('#tocBtn').style.display=curToc.length?'grid':'none'; }
+function setWords(){ if(curBook) curBook._words=($('#txtView').textContent.match(/\S+/g)||[]).length; }
+function openFlow(html,b){ mode='flow'; $('#txtView').style.display='block'; $('#enav').style.display='flex'; setEnav('flow'); $('#txtView').innerHTML=html; buildFlowToc(); setWords(); requestAnimationFrame(()=>{ scrollToRatio(b.progress||0); updateScroll(); }); }
+async function openDocx(buf,b){ mode='flow'; $('#txtView').style.display='block'; $('#enav').style.display='flex'; setEnav('flow'); $('#txtView').innerHTML='<div class="spin"></div>';
   try{ const r=await mammoth.convertToHtml({arrayBuffer:buf}); $('#txtView').innerHTML=r.value||'<p>(пусто)</p>'; }catch(e){ $('#txtView').innerHTML='<p>Не удалось открыть DOCX.</p>'; }
-  requestAnimationFrame(()=>{ scrollToRatio(b.progress||0); updateScroll(); }); }
+  buildFlowToc(); setWords(); requestAnimationFrame(()=>{ scrollToRatio(b.progress||0); updateScroll(); }); }
 function openEpub(buf,b){ mode='epub'; $('#epubArea').style.display='block'; $('#enav').style.display='flex'; setEnav('epub');
   epubBook=ePub(buf); rendition=epubBook.renderTo('epubArea',{width:'100%',height:'100%',flow:'paginated',spread:'none'}); applyEpubTheme(); rendition.display();
   epubBook.ready.then(()=>epubBook.locations.generate(1200)).then(()=>{ if(b.progress){ try{ rendition.display(epubBook.locations.cfiFromPercentage(b.progress)); }catch{} } });
+  if(epubBook.loaded&&epubBook.loaded.navigation) epubBook.loaded.navigation.then(nav=>{ curToc=(nav.toc||[]).map(i=>({label:(i.label||'').trim()||'Глава', target:i.href})); $('#tocBtn').style.display=curToc.length?'grid':'none'; }).catch(()=>{});
   rendition.on('relocated',loc=>{ const p=(loc&&loc.start&&loc.start.percentage)||0; $('#ePct').textContent=Math.round(p*100)+'%'; $('#rprog').style.width=(p*100)+'%'; saveProgress(p); });
 }
 async function openPdf(buf,b){ mode='pdf'; $('#pdfView').style.display='block'; $('#enav').style.display='flex'; setEnav('pdf');
@@ -390,11 +400,14 @@ async function renderPdfPage(canvas){ canvas.dataset.done='1'; const page=await 
 
 function setEnav(kind){
   if(kind==='epub'){ $('#ePrev').textContent='‹'; $('#eNext').textContent='›'; $('#ePrev').onclick=()=>rendition&&rendition.prev(); $('#eNext').onclick=()=>rendition&&rendition.next(); $('#ePct').textContent='0%'; }
-  else { $('#ePrev').textContent='−'; $('#eNext').textContent='+'; $('#ePrev').onclick=()=>zoomPdf(-0.2); $('#eNext').onclick=()=>zoomPdf(0.2); $('#ePct').textContent='100%'; }
+  else if(kind==='pdf'){ $('#ePrev').textContent='−'; $('#eNext').textContent='+'; $('#ePrev').onclick=()=>zoomPdf(-0.2); $('#eNext').onclick=()=>zoomPdf(0.2); $('#ePct').textContent='100%'; }
+  else { $('#ePrev').textContent='‹'; $('#eNext').textContent='›'; $('#ePrev').onclick=pagePrev; $('#eNext').onclick=pageNext; $('#ePct').textContent='0%'; }
 }
 async function zoomPdf(d){ pdfZoom=Math.max(0.6,Math.min(3,+(pdfZoom+d).toFixed(2))); $('#ePct').textContent=Math.round(pdfZoom*100)+'%'; const r=scrollRatio(); await layoutPdf(); scrollToRatio(r); selH(); }
+function pageNext(){ window.scrollBy({top:Math.round(window.innerHeight*0.88),behavior:'smooth'}); }
+function pagePrev(){ window.scrollBy({top:-Math.round(window.innerHeight*0.88),behavior:'smooth'}); }
 
-function back(){ if(rendition){try{rendition.destroy();}catch{}rendition=null;} if(pdfDoc){try{pdfDoc.destroy();}catch{}pdfDoc=null;} if(pdfIO){pdfIO.disconnect();pdfIO=null;} curBook=null; mode=null;
+function back(){ if(rendition){try{rendition.destroy();}catch{}rendition=null;} if(pdfDoc){try{pdfDoc.destroy();}catch{}pdfDoc=null;} if(pdfIO){pdfIO.disconnect();pdfIO=null;} curBook=null; mode=null; curToc=[];
   $('#reader').classList.remove('active'); $('#app').classList.add('active'); W&&W.BackButton&&W.BackButton.hide(); window.scrollTo(0,0); loadLibrary(); }
 $('#backBtn').onclick=back;
 $('#delBtn').onclick=()=>{ if(!curBook)return; const id=curBook.id; if(W&&W.showConfirm) W.showConfirm('Удалить книгу?',ok=>{if(ok)doDelete(id);}); else if(confirm('Удалить книгу?')) doDelete(id); };
@@ -402,18 +415,50 @@ async function doDelete(id){ await api('/api/delete/'+id,{json:{}}); haptic('med
 
 function scrollRatio(){ const max=document.documentElement.scrollHeight-window.innerHeight; return max>0?window.scrollY/max:0; }
 function scrollToRatio(r){ const max=document.documentElement.scrollHeight-window.innerHeight; window.scrollTo(0,r*max); }
-let st=null; function updateScroll(){ if(mode!=='flow'&&mode!=='pdf')return; const p=Math.min(1,scrollRatio()); $('#rprog').style.width=(p*100)+'%'; saveProgress(p); }
+let st=null; function updateScroll(){ if(mode!=='flow'&&mode!=='pdf')return; const p=Math.min(1,scrollRatio()); $('#rprog').style.width=(p*100)+'%';
+  if(mode==='flow'&&curBook&&curBook._words){ const left=Math.max(0,Math.round(curBook._words*(1-p)/180)); $('#ePct').textContent=left>0?('~'+left+' мин'):'Конец'; } else if(mode==='flow'){ $('#ePct').textContent=Math.round(p*100)+'%'; }
+  saveProgress(p); }
 window.addEventListener('scroll',()=>{ if(!$('#reader').classList.contains('active'))return; if(st)return; st=requestAnimationFrame(()=>{ updateScroll(); st=null; }); },{passive:true});
 let pt=null; function saveProgress(p){ if(!curBook||curSource!=='lib')return; curBook.progress=p; clearTimeout(pt); pt=setTimeout(()=>api('/api/progress/'+curBook.id,{json:{progress:p}}).catch(()=>{}),700); }
 
 function toggleChrome(){ $('#rbar').classList.toggle('hidden'); if($('#enav').style.display!=='none') $('#enav').classList.toggle('hidden'); }
-$('#txtView').addEventListener('click',toggleChrome);
+$('#txtView').addEventListener('click',e=>{ if(PREFS.pageMode==='page'&&mode==='flow'){ const w=window.innerWidth; if(e.clientX<w*0.30) return pagePrev(); if(e.clientX>w*0.70) return pageNext(); } toggleChrome(); });
 $('#pdfView').addEventListener('click',toggleChrome);
 
+/* ---------- TOC + bookmarks ---------- */
+let navTab='toc';
+$('#tocBtn').onclick=()=>{ navTab='toc'; openSheet('#navSheet'); renderNav(); };
+$('#ntToc').onclick=()=>{ navTab='toc'; $('#ntToc').classList.add('on'); $('#ntBm').classList.remove('on'); renderNav(); };
+$('#ntBm').onclick=()=>{ navTab='bm'; $('#ntBm').classList.add('on'); $('#ntToc').classList.remove('on'); renderNav(); };
+function bmKey(){ return 'bm_'+curSource+'_'+(curBook?curBook.id:'x'); }
+function getBM(cb){ if(W&&W.CloudStorage&&W.CloudStorage.getItem){ try{ W.CloudStorage.getItem(bmKey(),(e,v)=>{ let a=[]; if(v){try{a=JSON.parse(v);}catch{}} cb(a); }); return; }catch(e){} } cb([]); }
+function setBM(a){ try{ W&&W.CloudStorage&&W.CloudStorage.setItem&&W.CloudStorage.setItem(bmKey(),JSON.stringify(a)); }catch(e){} }
+function renderNav(){
+  $('#ntToc').classList.toggle('on',navTab==='toc'); $('#ntBm').classList.toggle('on',navTab==='bm');
+  const box=$('#navList');
+  if(navTab==='toc'){
+    if(!curToc.length){ box.innerHTML='<div class="empty" style="padding:24px">У этой книги нет оглавления</div>'; return; }
+    box.innerHTML=''; curToc.forEach(it=>{ const b=document.createElement('button'); b.className='it'; b.innerHTML=`<span>${esc(it.label)}</span>`; b.onclick=()=>gotoToc(it); box.appendChild(b); });
+  } else {
+    box.innerHTML='<div class="spin" style="margin:24px auto"></div>';
+    getBM(a=>{ if(!a.length){ box.innerHTML='<div class="empty" style="padding:24px">Закладок пока нет</div>'; return; }
+      box.innerHTML=''; a.slice().reverse().forEach((bm,ri)=>{ const idx=a.length-1-ri; const b=document.createElement('div'); b.className='it';
+        b.innerHTML=`<span>${esc(bm.label||'Закладка')}</span><small>${new Date(bm.ts).toLocaleDateString('ru-RU')}</small><button class="x">✕</button>`;
+        b.querySelector('span').onclick=()=>gotoBM(bm); b.onclick=ev=>{ if(ev.target.className!=='x') gotoBM(bm); };
+        b.querySelector('.x').onclick=ev=>{ ev.stopPropagation(); a.splice(idx,1); setBM(a); renderNav(); haptic('light'); };
+        box.appendChild(b); }); });
+  }
+}
+function gotoToc(it){ closeSheets(); if(mode==='epub'&&rendition){ try{rendition.display(it.target);}catch{} } else { const el=document.getElementById(it.target); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); } }
+function gotoBM(bm){ closeSheets(); if(bm.cfi&&rendition){ try{rendition.display(bm.cfi);}catch{} } else if(bm.ratio!=null){ scrollToRatio(bm.ratio); } }
+$('#addBmBtn').onclick=()=>{ getBM(a=>{ const bm={ts:Date.now()}; if(mode==='epub'&&rendition){ const loc=rendition.currentLocation(); bm.cfi=loc&&loc.start&&loc.start.cfi; const pc=loc&&loc.start&&loc.start.percentage||0; bm.label=Math.round(pc*100)+'%'; } else { bm.ratio=scrollRatio(); bm.label=Math.round(bm.ratio*100)+'%'; } a.push(bm); setBM(a); haptic('medium'); toast('Закладка добавлена'); navTab='bm'; renderNav(); }); };
+$('#markDoneBtn').onclick=()=>{ if(!curBook||curSource!=='lib'){ toast('Доступно для своих книг'); return; } curBook.progress=1; api('/api/progress/'+curBook.id,{json:{progress:1}}).catch(()=>{}); haptic('medium'); toast('Отмечено прочитанной'); closeSheets(); };
+
+/* ---------- Aa ---------- */
 $('#aaBtn').onclick=()=>{ $('#textOpts').style.display=mode==='pdf'?'none':'block'; openSheet('#aaSheet'); };
 function applyReaderTheme(){
   $('#reader').dataset.rtheme=PREFS.rtheme;
-  document.documentElement.style.setProperty('--r-font',PREFS.font==='sans'?'var(--sans)':'var(--serif)');
+  document.documentElement.style.setProperty('--r-font',FONTS[PREFS.font]||FONTS.serif);
   document.documentElement.style.setProperty('--r-fs',PREFS.fs+'px'); document.documentElement.style.setProperty('--r-lh',PREFS.lh);
   $('#dimmer').style.opacity=(1-PREFS.bright/100).toFixed(2);
   if(W){ try{ const c=getComputedStyle($('#reader')).getPropertyValue('--r-bg').trim(); W.setBackgroundColor&&W.setBackgroundColor(c); W.setHeaderColor&&W.setHeaderColor(c);}catch{} }
@@ -421,13 +466,16 @@ function applyReaderTheme(){
   $$('#fsSeg button').forEach(x=>x.classList.toggle('on',+x.dataset.fs===PREFS.fs));
   $$('#fontSeg button').forEach(x=>x.classList.toggle('on',x.dataset.font===PREFS.font));
   $$('#lhSeg button').forEach(x=>x.classList.toggle('on',parseFloat(x.dataset.lh)===PREFS.lh));
+  $$('#pageSeg button').forEach(x=>x.classList.toggle('on',x.dataset.pm===PREFS.pageMode));
   $('#bright').value=PREFS.bright; applyEpubTheme();
 }
-function applyEpubTheme(){ if(!rendition)return; const cs=getComputedStyle($('#reader')); rendition.themes.default({ body:{background:cs.getPropertyValue('--r-bg'),color:cs.getPropertyValue('--r-ink'),'font-family':PREFS.font==='sans'?'sans-serif':'serif','line-height':String(PREFS.lh)}, p:{'font-size':PREFS.fs+'px'} }); }
+function applyEpubTheme(){ if(!rendition)return; const cs=getComputedStyle($('#reader')); const fam=PREFS.font==='sans'?'sans-serif':(PREFS.font==='ptserif'?'"PT Serif",serif':'serif');
+  rendition.themes.default({ body:{background:cs.getPropertyValue('--r-bg'),color:cs.getPropertyValue('--r-ink'),'font-family':fam,'line-height':String(PREFS.lh)}, p:{'font-size':PREFS.fs+'px'} }); }
 $$('#themes button').forEach(b=>b.onclick=()=>{ PREFS.rtheme=b.dataset.rt; applyReaderTheme(); savePrefs(); selH(); });
 $$('#fsSeg button').forEach(b=>b.onclick=()=>{ PREFS.fs=+b.dataset.fs; applyReaderTheme(); savePrefs(); selH(); });
 $$('#fontSeg button').forEach(b=>b.onclick=()=>{ PREFS.font=b.dataset.font; applyReaderTheme(); savePrefs(); selH(); });
 $$('#lhSeg button').forEach(b=>b.onclick=()=>{ PREFS.lh=parseFloat(b.dataset.lh); applyReaderTheme(); savePrefs(); selH(); });
+$$('#pageSeg button').forEach(b=>b.onclick=()=>{ PREFS.pageMode=b.dataset.pm; applyReaderTheme(); savePrefs(); selH(); toast(b.dataset.pm==='page'?'Тап по краям — листать':'Свободная прокрутка'); });
 $('#bright').oninput=e=>{ PREFS.bright=+e.target.value; $('#dimmer').style.opacity=(1-PREFS.bright/100).toFixed(2); };
 $('#bright').onchange=savePrefs;
 
@@ -440,7 +488,7 @@ const scrim=$('#scrim'); function openSheet(s){ scrim.classList.add('show'); $(s
 function closeSheets(){ scrim.classList.remove('show'); $$('.sheet').forEach(s=>s.classList.remove('show')); }
 scrim.onclick=closeSheets;
 
-(async function(){ tgReady(); await loadPrefs(); $('#app').classList.add('active'); loadLibrary(); })();
+(async function(){ tgReady(); await loadPrefs(); applyAppTheme(); $('#sortSel').value=sortBy; $('#app').classList.add('active'); loadLibrary(); })();
 </script>
 </body>
 </html>
